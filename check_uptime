@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Gerben Geijteman <gerben@hyperized.net>
+# Check_uptime with perfdata (C) 2017
+
+# Parse arguments with getopts
+while getopts "hc:w:" opt; do
+  case $opt in
+    c)
+      critical="$OPTARG"
+      ;;
+    w)
+      warning="$OPTARG"
+      ;;
+    ?)
+      echo "Usage: ./check_uptime -w <warning value in days> -c <critical value in days>"
+      echo "Example: ./check_uptime -w 30 -c 90"
+      exit 3
+      ;;
+  esac
+done
+
+# Verify input
+if [ "$warning" == "" ] || [ "$critical" == "" ]
+then
+  echo "No argument supplied or argument missing."
+  echo "Usage: ./check_uptime -w <warning value in days> -c <critical value in days>"
+  echo "Example: ./check_uptime -w 30 -c 90"
+  exit 3
+else
+  days=`echo $(awk '{print $1}' /proc/uptime) / 3600 / 24 | bc`
+
+  if [[ "$days" -lt "$warning" ]]; then
+    echo "OK: Uptime is $days days | uptime=$days;$warning;$critical;"
+    exit 0
+  fi
+  if [ "$days" -ge "$warning" ] && [ "$days" -le "$critical" ]; then
+    echo "WARNING: Uptime is $days days | uptime=$days;$warning;$critical;"
+    exit 1
+  fi
+  if [[ "$days" -gt "$critical" ]]; then
+    echo "CRITICAL: Uptime is $days days | uptime=$days;$warning;$critical;"
+    exit 2
+  fi
+fi
