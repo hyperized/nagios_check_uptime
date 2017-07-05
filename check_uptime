@@ -1,5 +1,9 @@
-#!/bin/bash
-
+#!/usr/bin/env bash
+#
+# set -x;
+set -e;
+set -o pipefail;
+#
 # Gerben Geijteman <gerben@hyperized.net>
 # Check_uptime with perfdata (C) 2017
 
@@ -28,7 +32,7 @@ then
   echo "Example: ./check_uptime -w 30 -c 90"
   exit 3
 else
-  days=`echo $(awk '{print $1}' /proc/uptime) / 3600 / 24 | bc`
+  days="$(echo "$(awk '{print $1}' /proc/uptime)" / 3600 / 24 | bc)"
 
   if [[ "$days" -lt "$warning" ]]; then
     echo "OK: Uptime is $days days | uptime=$days;$warning;$critical;"
