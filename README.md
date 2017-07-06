@@ -18,6 +18,7 @@ chmod +x check_uptime
 ./check_uptime -h
 Usage: ./check_uptime -w <warning value in days> -c <critical value in days>
 Example: ./check_uptime -w 30 -c 90
+UPTIME CRITICAL: Uptime is 373 days | uptime=373;30;90;
 ```
 
 ## License
