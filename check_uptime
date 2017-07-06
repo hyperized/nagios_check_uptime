@@ -1,11 +1,28 @@
 #!/usr/bin/env bash
-#
+
+# Set modes
 # set -x;
 set -e;
 set -o pipefail;
+
 #
 # Gerben Geijteman <gerben@hyperized.net>
 # Check_uptime with perfdata (C) 2017
+#
+
+# Strings
+usage="Usage: ./check_uptime -w <warning value in days> -c <critical value in days>"
+example="Example: ./check_uptime -w 30 -c 90"
+result="UPTIME CRITICAL: Uptime is 373 days | uptime=373;30;90;"
+prefix="UPTIME"
+
+# Show help
+function myhelp() {
+  echo $usage
+  echo $example
+  echo $result
+  exit 3
+}
 
 # Parse arguments with getopts
 while getopts "hc:w:" opt; do
@@ -17,9 +34,7 @@ while getopts "hc:w:" opt; do
       warning="$OPTARG"
       ;;
     ?)
-      echo "Usage: ./check_uptime -w <warning value in days> -c <critical value in days>"
-      echo "Example: ./check_uptime -w 30 -c 90"
-      exit 3
+      myhelp
       ;;
   esac
 done
@@ -27,23 +42,22 @@ done
 # Verify input
 if [ "$warning" == "" ] || [ "$critical" == "" ]
 then
-  echo "No argument supplied or argument missing."
-  echo "Usage: ./check_uptime -w <warning value in days> -c <critical value in days>"
-  echo "Example: ./check_uptime -w 30 -c 90"
-  exit 3
+  myhelp
 else
+  # Execute
   days="$(echo "$(awk '{print $1}' /proc/uptime)" / 3600 / 24 | bc)"
+  report="Uptime is $days days | uptime=$days;$warning;$critical;"
 
   if [[ "$days" -lt "$warning" ]]; then
-    echo "OK: Uptime is $days days | uptime=$days;$warning;$critical;"
+    echo "$prefix OK: $report"
     exit 0
   fi
   if [ "$days" -ge "$warning" ] && [ "$days" -le "$critical" ]; then
-    echo "WARNING: Uptime is $days days | uptime=$days;$warning;$critical;"
+    echo "$prefix WARNING: $report"
     exit 1
   fi
   if [[ "$days" -gt "$critical" ]]; then
-    echo "CRITICAL: Uptime is $days days | uptime=$days;$warning;$critical;"
+    echo "$prefix CRITICAL: $report"
     exit 2
   fi
 fi
