@@ -8,7 +8,7 @@ Most likely works with all Debian based systems.
 ## Install
 
 ```sh
-git clone https://github.com/hyperized/nagio_check_uptime.git
+git clone https://github.com/hyperized/nagios_check_uptime.git
 cd check_uptime
 chmod +x check_uptime
 ```
